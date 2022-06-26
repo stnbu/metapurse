@@ -1,7 +1,7 @@
 use hex_literal::hex;
 
 #[tokio::main]
-async fn start() -> web3::Result<()> {
+pub async fn start() -> web3::Result<()> {
     let _ = env_logger::try_init();
     let transport = web3::transports::Http::new("http://localhost:8545")?;
     let web3 = web3::Web3::new(transport);
