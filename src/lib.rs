@@ -1,14 +1,22 @@
 use hex_literal::hex;
 
 use bevy::prelude::*;
+use bevy::input::keyboard::KeyboardInput;
 
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
     App::new()
+        .insert_resource(WindowDescriptor {
+            title: "Press Any Key To Win".to_string(),
+            width: 400.,
+            height: 300.,
+            ..default()
+        })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
+	.add_system(anykey)
         .run();
     Ok(())
 }
@@ -27,10 +35,10 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
             ..default()
         },
         text: Text::with_section(
-            "foo",
+            "The Anykey Game!\nPress Any Key To Win!",
             TextStyle {
                 font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                font_size: 100.0,
+                font_size: 20.0,
                 color: Color::WHITE,
             },
             TextAlignment {
@@ -68,4 +76,22 @@ pub async fn _start() -> Result<(), JsValue> {
 extern "C" {
     #[wasm_bindgen(js_namespace = console)]
     fn log(s: &str);
+}
+
+
+
+fn anykey(
+    mut key_evr: EventReader<KeyboardInput>,
+) {
+    use bevy::input::ElementState;
+    for ev in key_evr.iter() {
+        match ev.state {
+            ElementState::Pressed => {},
+            ElementState::Released => {
+		if let Some(key_code) = ev.key_code {
+                    print!("{:?}", key_code);
+		}
+            }
+        }
+    }
 }
