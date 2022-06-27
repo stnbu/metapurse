@@ -6,12 +6,6 @@ macro_rules! print {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
 
-// #[wasm_bindgen(start)]
-// pub fn start_x() -> Result<(), JsValue> {
-//     do_thing();
-//     Ok(())
-// }
-
 #[wasm_bindgen(start)]
 pub async fn start() -> Result<(), JsValue> {
     let _ = env_logger::try_init();
