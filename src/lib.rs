@@ -1,13 +1,52 @@
 use hex_literal::hex;
 
+use bevy::prelude::*;
+
 use wasm_bindgen::prelude::*;
+
+#[wasm_bindgen(start)]
+pub fn start() -> Result<(), JsValue> {
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_startup_system(setup)
+        .run();
+    Ok(())
+}
+
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn_bundle(UiCameraBundle::default());
+    commands.spawn_bundle(TextBundle {
+        style: Style {
+            align_self: AlignSelf::FlexEnd,
+            position_type: PositionType::Absolute,
+            position: Rect {
+                top: Val::Px(5.0),
+                left: Val::Px(15.0),
+                ..default()
+            },
+            ..default()
+        },
+        text: Text::with_section(
+            "foo",
+            TextStyle {
+                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font_size: 100.0,
+                color: Color::WHITE,
+            },
+            TextAlignment {
+                horizontal: HorizontalAlign::Center,
+                ..default()
+            },
+        ),
+        ..default()
+    });
+}
 
 macro_rules! print {
     ($($t:tt)*) => (log(&format_args!($($t)*).to_string()))
 }
 
-#[wasm_bindgen(start)]
-pub async fn start() -> Result<(), JsValue> {
+pub async fn _start() -> Result<(), JsValue> {
     let _ = env_logger::try_init();
     let transport = web3::transports::Http::new("http://localhost:8545").unwrap();
     let web3 = web3::Web3::new(transport);

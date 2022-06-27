@@ -13,3 +13,8 @@ Maybe:
 1. The game is: "Press Any Key", each key press increments wallet (with batching, maybe)
 
 Wee.
+
+### Needz Luv
+
+* Actually connect to a wallet
+* Add way simple bevy game
