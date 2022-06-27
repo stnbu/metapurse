@@ -1,6 +1,6 @@
 [package]
-name = "rust-web3_meets_wasm"
-version = "0.1.0"
+name = "metapurse"
+version = "0.1.2"
 edition = "2021"
 
 [dependencies]
@@ -15,4 +15,4 @@ crate-type = ["cdylib"]
 
 [profile.release]
 opt-level = 'z'
-lto = "thin" # other docs say lto can be `true`
+lto = "thin"

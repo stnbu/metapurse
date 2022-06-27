@@ -3,25 +3,17 @@
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
   </head>
   <body>
-    <h2>Bevy Thing III</h2>
+    <h2>Metapurse</h2>
     <p>
-      <ol>
-	<li>Wait for WASM to load/appear (gray rectangle beneath horizontal line)</li>
-	<li>Click gray rectangle to get focus</li>
-	<li>Influence path of white rectangle with arrow keys</li>
-	<li>Forgive poor user experience</li>
-	<li>say, "wee".</li>
-      </ol>
+      Metapurse! -- "That's my purse!"
     </p>
     <p>
-      Refresh this page now if you are a slow reader.
+      Look at the console.
     </p>
-    <hr />
     <script type="module">
-      import init from './pkg/rust_web3_meets_wasm.js';
-      window.addEventListener('load', async () => {
-	  await init('./pkg/rust_web3_meets_wasm_bg.wasm');
-      });
+      import init from './pkg/metapurse.js';
+      window.addEventListener('load', async () => { await
+      init('./pkg/metapurse_bg.wasm'); });
     </script>
   </body>
 </html>
