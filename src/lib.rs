@@ -1,27 +1,59 @@
-mod metamask;
-
 use hex_literal::hex;
 
 use bevy::input::keyboard::KeyboardInput;
 use bevy::prelude::*;
 
+use bevy_egui::{egui, EguiContext, EguiPlugin};
+use metamask_bevy::*;
+
 use wasm_bindgen::prelude::*;
+
+// #[wasm_bindgen(start)]
+// pub fn start() -> Result<(), JsValue> {
+//     App::new()
+//         .insert_resource(WindowDescriptor {
+//             title: "Press Any Key To Win".to_string(),
+//             width: 400.,
+//             height: 300.,
+//             ..default()
+//         })
+//         .add_plugins(DefaultPlugins)
+//         .add_plugin(MetaMaskPlugin)
+//         .add_startup_system(setup)
+//         .add_system(anykey)
+//         .run();
+//     Ok(())
+// }
 
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
-    App::new()
-        .insert_resource(WindowDescriptor {
-            title: "Press Any Key To Win".to_string(),
-            width: 400.,
-            height: 300.,
-            ..default()
-        })
+    let mut app = App::new();
+
+    #[cfg(target_arch = "wasm32")]
+    app.add_system(handle_browser_resize);
+
+    app.add_startup_system(setup)
         .add_plugins(DefaultPlugins)
-        .add_startup_system(setup)
+        .add_plugin(EguiPlugin)
+        .add_plugin(MetaMaskPlugin)
+        .add_system(ui_example)
         .add_system(anykey)
         .run();
     Ok(())
 }
+
+// ----
+// fn main() {
+//     let mut app = App::new();
+//     #[cfg(target_arch = "wasm32")]
+//     app.add_system(handle_browser_resize);
+//     app.add_plugins(DefaultPlugins)
+//         .add_plugin(EguiPlugin)
+//         .add_plugin(metamask::MetaMaskPlugin)
+//         .add_system(ui_example)
+//         .run();
+// }
+// ----
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
     let chaching = asset_server.load("sounds/chaching.ogg");
@@ -99,3 +131,56 @@ fn anykey(mut key_evr: EventReader<KeyboardInput>, audio: Res<Audio>, sound: Res
 }
 
 struct ChaChing(Handle<AudioSource>);
+
+// ------------------
+
+fn ui_example(
+    mut egui_context: ResMut<EguiContext>,
+    metamask_ch: ResMut<MetamaskChannel>,
+    app_data: Res<AppData>,
+    mut app_state: ResMut<State<AppState>>,
+) {
+    egui::CentralPanel::default().show(egui_context.ctx_mut(), |ui| {
+        let addr_tx = metamask_ch.addr_tx.clone();
+        let sign_tx = metamask_ch.sign_tx.clone();
+
+        if !app_data.no_metamask {
+            if ui.button("metamask").clicked() {
+                app_state.set(AppState::LoadingAddr).unwrap();
+                wasm_bindgen_futures::spawn_local(async move {
+                    request_account(&addr_tx).await;
+                });
+            }
+            if let Some(addr) = &app_data.user_wallet_addr {
+                let addr = addr.clone();
+                ui.label(addr.to_string());
+                if ui.button("Sign a text").clicked() {
+                    app_state.set(AppState::LoadingSign).unwrap();
+                    wasm_bindgen_futures::spawn_local(async move {
+                        sign_a_string(&sign_tx, &addr).await;
+                    })
+                }
+            }
+
+            if let Some(signed) = &app_data.signed {
+                ui.label(signed);
+            }
+        } else {
+            ui.label("no metamask");
+        }
+    });
+}
+
+#[cfg(target_arch = "wasm32")]
+fn handle_browser_resize(mut windows: ResMut<Windows>) {
+    let window = windows.get_primary_mut().unwrap();
+    let wasm_window = web_sys::window().unwrap();
+    let (target_width, target_height) = (
+        wasm_window.inner_width().unwrap().as_f64().unwrap() as f32,
+        wasm_window.inner_height().unwrap().as_f64().unwrap() as f32,
+    );
+
+    if window.width() != target_width || window.height() != target_height {
+        window.set_resolution(target_width, target_height);
+    }
+}

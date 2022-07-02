@@ -12,6 +12,8 @@ wasm-bindgen-futures = "0.4.31"
 bevy = "0.7.0"
 bevy_egui = "0.14.0"
 async-channel = "1.6.1"
+metamask-bevy = { path = "/Users/mburr/git/bevy-metamask" }
+web-sys = { version = "0.3.57", features = ["Window"]}
 
 [lib]
 crate-type = ["cdylib"]
