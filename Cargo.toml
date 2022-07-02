@@ -6,10 +6,12 @@ edition = "2021"
 [dependencies]
 env_logger = "0.9.0"
 hex-literal = "0.3.4"
-web3 = { version = "0.18.0", default-features = false, features = ["wasm", "http"] }
+web3 = { version = "0.18.0", default-features = false, features = ["wasm", "http", "eip-1193"] }
 wasm-bindgen = "0.2.81"
 wasm-bindgen-futures = "0.4.31"
 bevy = "0.7.0"
+bevy_egui = "0.14.0"
+async-channel = "1.6.1"
 
 [lib]
 crate-type = ["cdylib"]

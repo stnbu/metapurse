@@ -1,7 +1,9 @@
+mod metamask;
+
 use hex_literal::hex;
 
-use bevy::prelude::*;
 use bevy::input::keyboard::KeyboardInput;
+use bevy::prelude::*;
 
 use wasm_bindgen::prelude::*;
 
@@ -16,12 +18,15 @@ pub fn start() -> Result<(), JsValue> {
         })
         .add_plugins(DefaultPlugins)
         .add_startup_system(setup)
-	.add_system(anykey)
+        .add_system(anykey)
         .run();
     Ok(())
 }
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+    let chaching = asset_server.load("sounds/chaching.ogg");
+    commands.insert_resource(ChaChing(chaching));
+
     commands.spawn_bundle(UiCameraBundle::default());
     commands.spawn_bundle(TextBundle {
         style: Style {
@@ -78,20 +83,19 @@ extern "C" {
     fn log(s: &str);
 }
 
-
-
-fn anykey(
-    mut key_evr: EventReader<KeyboardInput>,
-) {
+fn anykey(mut key_evr: EventReader<KeyboardInput>, audio: Res<Audio>, sound: Res<ChaChing>) {
     use bevy::input::ElementState;
     for ev in key_evr.iter() {
         match ev.state {
-            ElementState::Pressed => {},
+            ElementState::Pressed => {}
             ElementState::Released => {
-		if let Some(key_code) = ev.key_code {
+                if let Some(key_code) = ev.key_code {
                     print!("{:?}", key_code);
-		}
+                    audio.play(sound.0.clone());
+                }
             }
         }
     }
 }
+
+struct ChaChing(Handle<AudioSource>);
