@@ -6,7 +6,8 @@ edition = "2021"
 [dependencies]
 env_logger = "0.9.0"
 hex-literal = "0.3.4"
-web3 = { version = "0.18.0", default-features = false, features = ["wasm", "http", "eip-1193"] }
+web3 = { version = "0.18.0", default-features = false, features = ["wasm", "http", "eip-1193", "ws-async-std"] }
+#async-std = { version = "1.6" }
 wasm-bindgen = "0.2.81"
 wasm-bindgen-futures = "0.4.31"
 bevy = "0.7.0"

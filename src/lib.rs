@@ -1,5 +1,10 @@
 use bevy::prelude::*;
 
+//use futures::executor::block_on;
+//use futures_lite::future::block_on;
+
+use async_std::task::block_on;
+
 use bevy_egui::{egui, EguiContext, EguiPlugin};
 use metamask_bevy::*;
 
@@ -7,6 +12,8 @@ use wasm_bindgen::prelude::*;
 
 #[macro_use]
 mod console;
+
+use web3;
 
 //extern crate console;
 
@@ -24,6 +31,29 @@ pub fn start() -> Result<(), JsValue> {
         //.add_system(anykey)
         .run();
     Ok(())
+}
+
+// struct Wallet {
+//     web3: bool,
+// }
+// impl FromWorld for Wallet {
+//     fn from_world(world: &mut World) -> Self {
+//         Wallet { web3: true }
+//     }
+// }
+
+struct Wallet {
+    web3: web3::Web3<web3::transports::WebSocket>,
+}
+
+impl Default for Wallet {
+    fn default() -> Self {
+        Wallet {
+            web3: web3::Web3::new(block_on(web3::transports::WebSocket::new(
+                "ws://localhost:8546",
+            ))),
+        }
+    }
 }
 
 fn ui_example(
