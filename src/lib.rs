@@ -31,6 +31,8 @@ fn ui_example(
         let addr_tx = metamask_ch.addr_tx.clone();
         let sign_tx = metamask_ch.sign_tx.clone();
 
+        ui.label("Hello. <tap-tap>. Is this thing on? World?");
+
         if !app_data.no_metamask {
             if ui.button("metamask").clicked() {
                 app_state.set(AppState::LoadingAddr).unwrap();
