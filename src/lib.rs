@@ -5,6 +5,11 @@ use metamask_bevy::*;
 
 use wasm_bindgen::prelude::*;
 
+#[macro_use]
+mod console;
+
+//extern crate console;
+
 #[wasm_bindgen(start)]
 pub fn start() -> Result<(), JsValue> {
     let mut app = App::new();
@@ -33,29 +38,36 @@ fn ui_example(
 
         ui.label("Hello. <tap-tap>. Is this thing on? World?");
 
-        if !app_data.no_metamask {
-            if ui.button("metamask").clicked() {
-                app_state.set(AppState::LoadingAddr).unwrap();
+        if app_data.no_metamask {
+            panic!("You have no Metamask. I'm a bird.");
+        }
+        if ui.button("metamask").clicked() {
+            app_state.set(AppState::LoadingAddr).unwrap();
+            wasm_bindgen_futures::spawn_local(async move {
+                request_account(&addr_tx).await;
+            });
+        }
+        match app_data.user_wallet_addr {
+            Some(_addr) => {
+                ui.label("yes wallet");
+            }
+            None => {
+                ui.label("no wallet");
+            }
+        }
+        if let Some(addr) = &app_data.user_wallet_addr {
+            let addr = addr.clone();
+            ui.label(addr.to_string());
+            if ui.button("Sign a text").clicked() {
+                app_state.set(AppState::LoadingSign).unwrap();
                 wasm_bindgen_futures::spawn_local(async move {
-                    request_account(&addr_tx).await;
-                });
+                    sign_a_string(&sign_tx, &addr).await;
+                })
             }
-            if let Some(addr) = &app_data.user_wallet_addr {
-                let addr = addr.clone();
-                ui.label(addr.to_string());
-                if ui.button("Sign a text").clicked() {
-                    app_state.set(AppState::LoadingSign).unwrap();
-                    wasm_bindgen_futures::spawn_local(async move {
-                        sign_a_string(&sign_tx, &addr).await;
-                    })
-                }
-            }
+        }
 
-            if let Some(signed) = &app_data.signed {
-                ui.label(signed);
-            }
-        } else {
-            ui.label("no metamask");
+        if let Some(signed) = &app_data.signed {
+            ui.label(signed);
         }
     });
 }
