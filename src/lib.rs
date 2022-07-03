@@ -32,12 +32,13 @@ pub fn start() -> Result<(), JsValue> {
     #[cfg(target_arch = "wasm32")]
     app.add_system(handle_browser_resize);
 
-    app.add_startup_system(setup)
+    app
+        //.add_startup_system(setup)
         .add_plugins(DefaultPlugins)
         .add_plugin(EguiPlugin)
         .add_plugin(MetaMaskPlugin)
         .add_system(ui_example)
-        .add_system(anykey)
+        //.add_system(anykey)
         .run();
     Ok(())
 }
